@@ -1,0 +1,21 @@
+CC = c++
+CFLAGS = -g -Wall -m32 -std=c++11 `sdl-config --libs`
+CPPFLAGS = -g -Wall -m32 -std=c++11 `sdl-config --libs`
+DEPS = datatypes.h	vector.h
+
+ifeq ($(shell uname), Darwin)
+  LIBS = -framework OpenGL -framework GLUT
+else
+  LIBS = -lGL -lGLU -lglut
+endif
+
+sdl_gl: sdl_gl.o
+	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
+
+.o:.c
+	$(CC) $(CFLAGS) -c $<
+
+clean: FORCE
+	-rm -f *.o *~ sdl_gl *core*
+
+FORCE:
