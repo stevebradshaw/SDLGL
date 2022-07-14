@@ -273,7 +273,7 @@ light1.addLightToScene() ;
             vt.x, vt.y, vt.z,
             0,     1,     0) ;
 
- // icosphere.draw() ;
+  icosphere.draw() ;
   //cube.draw() ; 
  // lightcube.draw() ; 
   draw_wire_gridY(10,0.5,0) ;
@@ -435,11 +435,11 @@ debugDisplay.SetProperties(width,height) ;
 debugDisplay.InitFontTextures() ;
 //cout << "after init font textures" << endl; 
 
- //icosphere.do_subdivide() ; // do_subdivide(icoRoot) ;
-/*     icosphere.do_subdivide() ; 
-      icosphere.do_subdivide() ; 
-       icosphere.do_subdivide() ; 
-        icosphere.do_subdivide() ; */
+// icosphere.do_subdivide() ; // do_subdivide(icoRoot) ;
+//     icosphere.do_subdivide() ; 
+//      icosphere.do_subdivide() ; 
+//       icosphere.do_subdivide() ; 
+//        icosphere.do_subdivide() ; 
 //cout << "subdivided icosphere" << endl ; 
 //particleCloud.dump() ;
   glEnable(GL_DEPTH_TEST) ;
