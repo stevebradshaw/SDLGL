@@ -13,8 +13,9 @@ TextDisplay::TextDisplay(int width, int height) {
 
 void TextDisplay::SetProperties(int width, int height) {
 
-	cout << m_NumCharsX << endl ;
-	cout << m_NumCharsY << endl ;
+  cout << "TextDisplay::SetProperties" << endl ;
+  cout << "width: " << width << endl ;
+  cout << "height: " << height << endl ;
 
 	//*buffer = new char[100*100] ;
 
@@ -25,6 +26,8 @@ void TextDisplay::SetProperties(int width, int height) {
     m_NumCharsX    = m_Width / m_LetterWidth ; 
     m_NumCharsY    = m_Height / m_LetterHeight ;
 
+	cout << "CharsX: " << m_NumCharsX << endl ;
+	cout << "CharsY: " << m_NumCharsY << endl << endl ;
 }
 
 void TextDisplay::InitFontTextures(void) {

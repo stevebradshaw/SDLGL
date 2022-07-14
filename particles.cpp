@@ -15,7 +15,7 @@ Particles::Particles() {
 
 	//TODO:  Set all member variables
 
-	cout << sizeof(particle) << endl ;
+	cout << "sizeof(particle): " << sizeof(particle) << endl ;
 //    maxParticles = max ;
 /*	int i = 0 ;
 

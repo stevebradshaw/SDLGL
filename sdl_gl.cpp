@@ -226,7 +226,7 @@ static void draw_screen( void )
 
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-//  debugDisplay.ClearTextDisplay() ;
+  debugDisplay.ClearTextDisplay() ;
 
   GLfloat lightpos[] = {10*(GLfloat)cos(light_angle), 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle), 1};
 
@@ -257,13 +257,15 @@ light1.addLightToScene() ;
 
 
 
-
+//cout << "draw_screen 1" << endl ;
   debugDisplay.PrintAt(0,0,(long int)xang) ;
+//cout << "draw_screen 2" << endl ;
   debugDisplay.PrintAt(10,0,(long int)yang) ;
 //  debugDisplay.PrintAt(0,3,(long int)particleCloud.count()) ;
 //  debugDisplay.PrintAt(0,4,(long int)particleFountain.count()) ;
   debugDisplay.PrintAt(0,5,(long int)particleBurster.count()) ; 
   /* We don't want to modify the projection matrix. */
+//cout << "draw_screen 3" << endl ;
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity( );
 
@@ -287,10 +289,12 @@ particleFountain2.drawEmitter() ;*/
 
 particleBurster.draw() ;
 particleBurster.drawEmitter() ;
-
-  debugDisplay.DrawTextDisplay() ;
+//cout << "4" << endl ;
+//  debugDisplay.DrawTextDisplay() ;
+//cout << "5" << endl ;
 
   SDL_GL_SwapBuffers( );
+//cout << "6" << endl ;
 }
 
 static void setup_opengl( int width, int height )
@@ -323,6 +327,8 @@ static void setup_opengl( int width, int height )
 int main( int argc, char* argv[] )
 {
 
+//cout << "START" << endl ;
+
     /* Information about the current video settings. */
     const SDL_VideoInfo* info = NULL;
 
@@ -344,7 +350,7 @@ int main( int argc, char* argv[] )
 
     /* Let's get some video information. */
     info = SDL_GetVideoInfo( );
-
+//cout << "Got VideoInfo" << endl ;
     if( !info ) {
         /* This should probably never happen. */
         fprintf( stderr, "Video query failed: %s\n",
@@ -367,9 +373,13 @@ int main( int argc, char* argv[] )
 
     width = info->current_w ;
     height = info->current_h ;
-
+	cout << "video width: " << width << endl ;
+	cout << "video height: " << height << endl ;
+	cout << "video bpp: " << bpp << endl ;
+//cout << "SetProperties" << endl ;
 debugDisplay.SetProperties(width,height) ;
 
+//cout << "DOne SetProperties" << endl ;
     /*
      * Now, we want to setup our requested
      * window attributes for our OpenGL window.
@@ -393,6 +403,7 @@ debugDisplay.SetProperties(width,height) ;
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     //SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 5 );
+//cout << "Set a bunch of attributes..." << endl ;
     /*
      * We want to request that SDL provide us
      * with an OpenGL window, in a fullscreen
@@ -413,33 +424,37 @@ debugDisplay.SetProperties(width,height) ;
              SDL_GetError( ) );
         quit( 1 );
     }
+//cout << "After set video mode" << endl ;
 
     /*
      * At this point, we should have a properly setup
      * double-buffered window for use with OpenGL.
      */
     setup_opengl( width, height );
-
+//cout << "after setup opengl" << endl ;
 debugDisplay.InitFontTextures() ;
+//cout << "after init font textures" << endl; 
 
- icosphere.do_subdivide() ; // do_subdivide(icoRoot) ;
-     icosphere.do_subdivide() ; 
+ //icosphere.do_subdivide() ; // do_subdivide(icoRoot) ;
+/*     icosphere.do_subdivide() ; 
       icosphere.do_subdivide() ; 
        icosphere.do_subdivide() ; 
-        icosphere.do_subdivide() ; 
- 
+        icosphere.do_subdivide() ; */
+//cout << "subdivided icosphere" << endl ; 
 //particleCloud.dump() ;
   glEnable(GL_DEPTH_TEST) ;
+//cout << "enabled depth test" << endl ;
   glDepthFunc(GL_LESS) ;
 
   glEnable (GL_LIGHTING); //enable the lighting
+//cout << "enabled lighting" << endl ; 
 
 light0.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
 light0.setDiffuse(1,0,0,1) ;
 
 light1.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
 light1.setDiffuse(0,1,0,1) ;
-
+//cout << "set light properties" << endl ;
 
 /*particleCloud.setMaxNumber(5000) ;
 particleCloud.setEmitterType(1) ;
@@ -465,8 +480,9 @@ particleBurster.setEmitterType(4) ;
 particleBurster.setEmitterOrigin({10*(GLfloat)cos(light_angle), 6 + 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle)}) ;  
 particleBurster.setEmitterSize(1) ;
   //glEnable (GL_LIGHT0); //enable LIGHT0, our Diffuse Light
+//cout << "about to enable light 1" << endl ;
   glEnable (GL_LIGHT1); //enable LIGHT0, our Diffuse Light
-
+//cout << "enabled light 1" << endl ;
   glShadeModel (GL_SMOOTH); //set the shader to smooth shader    
 
     SDL_ShowCursor(SDL_DISABLE); 
@@ -486,21 +502,29 @@ current_time = SDL_GetTicks();
    * Now we want to begin our normal app process--
    * an event loop with a lot of redrawing.
    */
+//cout << "about to enter while loop" << endl ;
   while( 1 ) {
       /* Process incoming events. */
 
+//cout << "A" << endl ;
        old_time = current_time;
+//cout << "A" << endl ;
        current_time = SDL_GetTicks();
+//cout << "A" << endl ;
        ftime = (current_time - old_time) / 1000.0f; 
+//cout << "A" << endl ;
             debugDisplay.PrintAt(0,1,ftime) ;
                         debugDisplay.PrintAt(0,2,1/ftime) ;
+//cout << "A" << endl ;
       process_events( );
 
+//cout << "A" << endl ;
       animate(ftime) ;
       /* Draw the screen. */
+//cout << "A" << endl ;
       draw_screen( );
 
-      debugDisplay.ClearTextDisplay() ;
+//      debugDisplay.ClearTextDisplay() ;
   }
 
   /* Never reached. */
