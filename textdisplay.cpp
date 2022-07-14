@@ -25,7 +25,10 @@ void TextDisplay::SetProperties(int width, int height) {
     m_HalfHeight   = m_Height / 2 ;
     m_NumCharsX    = m_Width / m_LetterWidth ; 
     m_NumCharsY    = m_Height / m_LetterHeight ;
-
+    cout << "m_LetterWidth: " << m_LetterWidth << endl ;
+    cout << "m_LetterHeight: " << m_LetterHeight << endl ;
+    cout << "m_HalfWidth: " << m_HalfWidth << endl ;
+    cout << "m_HalfHeight: " << m_HalfHeight << endl ;
 	cout << "CharsX: " << m_NumCharsX << endl ;
 	cout << "CharsY: " << m_NumCharsY << endl << endl ;
 }
@@ -81,8 +84,8 @@ void TextDisplay::InitFontTextures(void) {
 
 void TextDisplay::ClearTextDisplay() {
 //void cTextDisplay::ClearDisplay() {
-	for (int i=0; i<100; i++) {
-		for (int j=0; j<100; j++) {
+	for (int i=0; i<m_NumCharsX; i++) {
+		for (int j=0; j<m_NumCharsY; j++) {
 			sBuffer[i][j] = ' ' ;
 		}
 	}
@@ -166,6 +169,7 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor3f(1,1,1) ;
 
 	int left, right, top, bottom ;
+	
 	for (int xp=0;xp<m_NumCharsX;xp++) {
 		for (int yp=0;yp<m_NumCharsY;yp++) {
 			if (sBuffer[xp][yp] != 32) {
@@ -173,7 +177,7 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				top    = (int) ( m_HalfHeight - m_LetterHeight * yp) ;
 				right  = (int) (-m_HalfWidth  + m_LetterWidth  * (xp+1)) ;
 				bottom = (int) ( m_HalfHeight - m_LetterHeight * (yp+1)) ;
-				glBindTexture(GL_TEXTURE_2D, gliFontTexture[(int)sBuffer[xp][yp]]);
+	glBindTexture(GL_TEXTURE_2D, gliFontTexture[(int)sBuffer[xp][yp]]);
 				//glBindTexture(GL_TEXTURE_2D, gliFontTexture[65]);
 				glBegin(GL_QUADS) ;
 					glTexCoord2d(0,1) ; glVertex3d(  left, bottom, 0) ;

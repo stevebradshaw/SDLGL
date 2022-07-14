@@ -35,66 +35,10 @@ using namespace std;
 #include "object.h"
 #include "icosphere.h"
 #include "cube.h"
+#include "light.h"
 #include "grid.h"
 #include "textdisplay.h"
 #include "particles.h"
-/**************************************************************************/
-
-class Light {
-
-  GLenum light ;
-  GLfloat lightpos[4] ;
-  GLfloat diffuse[4] ;
-  GLfloat ambient[4] ;
-Cube lightcube ; //(0.1, { 0, 5, 0 }, { 1.0, 1.0, 1.0,1 }) ;
-  public:
-    Light(GLenum l) ;
-
-    void addLightToScene() ;
-    void setPosition(GLfloat x, GLfloat y, GLfloat z, GLfloat w) ;
-    void setAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a) ;
-    void setDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a) ;
-} ;
-
-
-Light::Light(GLenum l) {
-  light = l ;
-  //glEnable(l) ;
-}
-
-void Light::addLightToScene() {
-  glEnable(light) ;
-  //GLfloat lightpos1[] = {10*(GLfloat)cos(light_angle+10), 5*(GLfloat)sin(3*light_angle+10), 10*(GLfloat)sin(light_angle+10), 1};
-  glLightfv(light, GL_POSITION, lightpos);
-
-  //GLfloat diffuse1[] = {0.0f, 1.0f, 0.0f , 1.0f};
-  glLightfv(light, GL_DIFFUSE, diffuse);
-
-  //GLfloat ambient1[] = {0.0f, 0.0f, 0.0f, 0.0f};
-  glLightfv(light, GL_AMBIENT, ambient);
-
-}
-
-void Light::setPosition(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
-  lightpos[0] = x ;
-  lightpos[1] = y ;
-  lightpos[2] = z ;
-  lightpos[3] = w ;     
-}
-
-void Light::setAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
-  ambient[0] = r ;
-  ambient[1] = g ;
-  ambient[2] = b ;
-  ambient[3] = a ;     
-}
-
-void Light::setDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
-  diffuse[0] = r ;
-  diffuse[1] = g ;
-  diffuse[2] = b ;
-  diffuse[3] = a ;     
-}
 /**************************************************************************/
 point3D vp = {5,3,5}, vd, vt ;
 bool bMove = false ;
@@ -113,9 +57,9 @@ TextDisplay debugDisplay ;
 
 Light light0(GL_LIGHT0), light1(GL_LIGHT1) ;
 
-/*Particles particleCloud ;
+Particles particleCloud ;
 Particles particleFountain ;
-Particles particleFountain2 ;*/
+Particles particleFountain2 ;
 Particles particleBurster ;
 /**************************************************************************/
 
@@ -158,9 +102,9 @@ static void animate(float delta) {
   vt.y = vp.y - vd.y ; 
   vt.z = vp.z - vd.z ; 
 
- /* particleCloud.animate(delta) ;
+  particleCloud.animate(delta) ;
   particleFountain.animate(delta) ;
-  particleFountain2.animate(delta) ; */ 
+  particleFountain2.animate(delta) ; 
   particleBurster.animate(delta) ;
 
 particleBurster.setEmitterOrigin({10*(GLfloat)cos(light_angle), 6 + 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle)}) ;  
@@ -275,26 +219,23 @@ light1.addLightToScene() ;
 
   icosphere.draw() ;
   //cube.draw() ; 
- // lightcube.draw() ; 
+  lightcube.draw() ; 
   draw_wire_gridY(10,0.5,0) ;
 
-//particleCloud.draw() ;
-//particleCloud.drawEmitter() ;
+particleCloud.draw() ;
+particleCloud.drawEmitter() ;
 
-/*particleFountain.draw() ;
+particleFountain.draw() ;
 particleFountain.drawEmitter() ;
 
 particleFountain2.draw() ;
-particleFountain2.drawEmitter() ;*/
+particleFountain2.drawEmitter() ;
 
 particleBurster.draw() ;
 particleBurster.drawEmitter() ;
-//cout << "4" << endl ;
-//  debugDisplay.DrawTextDisplay() ;
-//cout << "5" << endl ;
+  debugDisplay.DrawTextDisplay() ;
 
   SDL_GL_SwapBuffers( );
-//cout << "6" << endl ;
 }
 
 static void setup_opengl( int width, int height )
@@ -435,11 +376,11 @@ debugDisplay.SetProperties(width,height) ;
 debugDisplay.InitFontTextures() ;
 //cout << "after init font textures" << endl; 
 
-// icosphere.do_subdivide() ; // do_subdivide(icoRoot) ;
-//     icosphere.do_subdivide() ; 
-//      icosphere.do_subdivide() ; 
-//       icosphere.do_subdivide() ; 
-//        icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ;
+ icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ; 
 //cout << "subdivided icosphere" << endl ; 
 //particleCloud.dump() ;
   glEnable(GL_DEPTH_TEST) ;
@@ -456,7 +397,7 @@ light1.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
 light1.setDiffuse(0,1,0,1) ;
 //cout << "set light properties" << endl ;
 
-/*particleCloud.setMaxNumber(5000) ;
+particleCloud.setMaxNumber(5000) ;
 particleCloud.setEmitterType(1) ;
 particleCloud.setEmitterOrigin({0,5,0}) ;
 particleCloud.setEmitterSize(10) ;
@@ -472,7 +413,7 @@ particleFountain2.setMaxNumber(1000) ;
 particleFountain2.setEmitterType(4) ;
 particleFountain2.setEmitterOrigin({0,5,0}) ;
 particleFountain2.setEmitterSize(1) ;
-particleFountain2.setEmitterStrength(2) ;*/
+particleFountain2.setEmitterStrength(2) ;
 
 particleBurster.setMaxNumber(5000) ;
 particleBurster.setEmitterType(4) ;
@@ -502,32 +443,24 @@ current_time = SDL_GetTicks();
    * Now we want to begin our normal app process--
    * an event loop with a lot of redrawing.
    */
-//cout << "about to enter while loop" << endl ;
   while( 1 ) {
       /* Process incoming events. */
 
-//cout << "A" << endl ;
        old_time = current_time;
-//cout << "A" << endl ;
        current_time = SDL_GetTicks();
-//cout << "A" << endl ;
        ftime = (current_time - old_time) / 1000.0f; 
-//cout << "A" << endl ;
             debugDisplay.PrintAt(0,1,ftime) ;
                         debugDisplay.PrintAt(0,2,1/ftime) ;
-//cout << "A" << endl ;
       process_events( );
 
-//cout << "A" << endl ;
       animate(ftime) ;
       /* Draw the screen. */
-//cout << "A" << endl ;
       draw_screen( );
 
 //      debugDisplay.ClearTextDisplay() ;
   }
 
   /* Never reached. */
-
+  cout << "Quiting...." << endl ;
   return 0;
 }

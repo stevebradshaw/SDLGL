@@ -57,7 +57,7 @@ void IcoSphere::subdivide(node* t) {
   addTriangle(b, t->p3, c) ;
   addTriangle(a, b, c) ;
 
-  deleteTriangle(t->id) ;
+//  deleteTriangle(t->id) ;
 }
 
 void IcoSphere::do_subdivide() {

@@ -22,7 +22,7 @@ class TextDisplay {
 		GLuint gliFontTexture[128] ;
 
 		//TODO:  sBuffer should be a pointer to enough space for the required text display
-		char sBuffer[100][100] ;
+		char sBuffer[200][100] ;
 
 		char *buffer ;
 
