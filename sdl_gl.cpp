@@ -528,5 +528,6 @@ current_time = SDL_GetTicks();
   }
 
   /* Never reached. */
+
   return 0;
 }
