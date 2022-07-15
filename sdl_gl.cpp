@@ -62,24 +62,44 @@ Particles particleFountain ;
 Particles particleFountain2 ;
 Particles particleBurster ;
 /**************************************************************************/
+static void setup_scene() {
 
-static void quit( int status ) {
+ icosphere.do_subdivide() ;
+ icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ; 
+ icosphere.do_subdivide() ; 
 
-    SDL_Quit( );
-    exit( status );
+light0.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
+light0.setDiffuse(1,0,0,1) ;
 
-}
+light1.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
+light1.setDiffuse(0,1,0,1) ;
 
-static void handle_key_down( SDL_keysym* keysym ) {
 
-  switch( keysym->sym ) {
-    case SDLK_ESCAPE:
-        quit( 0 );
-        break;
-    default:
-        break;
-  }
+particleCloud.setMaxNumber(5000) ;
+particleCloud.setEmitterType(1) ;
+particleCloud.setEmitterOrigin({0,5,0}) ;
+particleCloud.setEmitterSize(10) ;
+particleCloud.setEmitterStrength(1) ;
 
+particleFountain.setMaxNumber(1000) ;
+particleFountain.setEmitterType(2) ;
+particleFountain.setEmitterOrigin({-2,0,0}) ;
+particleFountain.setEmitterSize(1) ;
+particleFountain.setEmitterStrength(2) ;
+
+particleFountain2.setMaxNumber(1000) ;
+particleFountain2.setEmitterType(4) ;
+particleFountain2.setEmitterOrigin({0,5,0}) ;
+particleFountain2.setEmitterSize(1) ;
+particleFountain2.setEmitterStrength(2) ;
+
+particleBurster.setMaxNumber(5000) ;
+particleBurster.setEmitterType(4) ;
+//particleBurster.setEmitterOrigin({2,10,2}) ;
+particleBurster.setEmitterOrigin({10*(GLfloat)cos(light_angle), 6 + 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle)}) ;  
+particleBurster.setEmitterSize(1) ;
 }
 
 static void animate(float delta) {
@@ -107,7 +127,26 @@ static void animate(float delta) {
   particleFountain2.animate(delta) ; 
   particleBurster.animate(delta) ;
 
-particleBurster.setEmitterOrigin({10*(GLfloat)cos(light_angle), 6 + 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle)}) ;  
+  particleBurster.setEmitterOrigin({10*(GLfloat)cos(light_angle), 6 + 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle)}) ;  
+}
+/**************************************************************************/
+static void quit( int status ) {
+
+    SDL_Quit( );
+    exit( status );
+
+}
+
+static void handle_key_down( SDL_keysym* keysym ) {
+
+  switch( keysym->sym ) {
+    case SDLK_ESCAPE:
+        quit( 0 );
+        break;
+    default:
+        break;
+  }
+
 }
 
 static void process_events( void )
@@ -201,12 +240,10 @@ light1.addLightToScene() ;
 
 
 
-//cout << "draw_screen 1" << endl ;
   debugDisplay.PrintAt(0,0,(long int)xang) ;
-//cout << "draw_screen 2" << endl ;
   debugDisplay.PrintAt(10,0,(long int)yang) ;
-//  debugDisplay.PrintAt(0,3,(long int)particleCloud.count()) ;
-//  debugDisplay.PrintAt(0,4,(long int)particleFountain.count()) ;
+  debugDisplay.PrintAt(0,3,(long int)particleCloud.count()) ;
+  debugDisplay.PrintAt(0,4,(long int)particleFountain.count()) ;
   debugDisplay.PrintAt(0,5,(long int)particleBurster.count()) ; 
   /* We don't want to modify the projection matrix. */
 //cout << "draw_screen 3" << endl ;
@@ -376,11 +413,8 @@ debugDisplay.SetProperties(width,height) ;
 debugDisplay.InitFontTextures() ;
 //cout << "after init font textures" << endl; 
 
- icosphere.do_subdivide() ;
- icosphere.do_subdivide() ; 
- icosphere.do_subdivide() ; 
- icosphere.do_subdivide() ; 
- icosphere.do_subdivide() ; 
+setup_scene() ;
+
 //cout << "subdivided icosphere" << endl ; 
 //particleCloud.dump() ;
   glEnable(GL_DEPTH_TEST) ;
@@ -390,36 +424,8 @@ debugDisplay.InitFontTextures() ;
   glEnable (GL_LIGHTING); //enable the lighting
 //cout << "enabled lighting" << endl ; 
 
-light0.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
-light0.setDiffuse(1,0,0,1) ;
-
-light1.setAmbient(0.0f,0.0f,0.0f,0.0f) ;
-light1.setDiffuse(0,1,0,1) ;
 //cout << "set light properties" << endl ;
 
-particleCloud.setMaxNumber(5000) ;
-particleCloud.setEmitterType(1) ;
-particleCloud.setEmitterOrigin({0,5,0}) ;
-particleCloud.setEmitterSize(10) ;
-particleCloud.setEmitterStrength(1) ;
-
-particleFountain.setMaxNumber(1000) ;
-particleFountain.setEmitterType(2) ;
-particleFountain.setEmitterOrigin({-2,0,0}) ;
-particleFountain.setEmitterSize(1) ;
-particleFountain.setEmitterStrength(2) ;
-
-particleFountain2.setMaxNumber(1000) ;
-particleFountain2.setEmitterType(4) ;
-particleFountain2.setEmitterOrigin({0,5,0}) ;
-particleFountain2.setEmitterSize(1) ;
-particleFountain2.setEmitterStrength(2) ;
-
-particleBurster.setMaxNumber(5000) ;
-particleBurster.setEmitterType(4) ;
-//particleBurster.setEmitterOrigin({2,10,2}) ;
-particleBurster.setEmitterOrigin({10*(GLfloat)cos(light_angle), 6 + 5*(GLfloat)sin(3*light_angle), 10*(GLfloat)sin(light_angle)}) ;  
-particleBurster.setEmitterSize(1) ;
   //glEnable (GL_LIGHT0); //enable LIGHT0, our Diffuse Light
 //cout << "about to enable light 1" << endl ;
   glEnable (GL_LIGHT1); //enable LIGHT0, our Diffuse Light
@@ -457,7 +463,6 @@ current_time = SDL_GetTicks();
       /* Draw the screen. */
       draw_screen( );
 
-//      debugDisplay.ClearTextDisplay() ;
   }
 
   /* Never reached. */
