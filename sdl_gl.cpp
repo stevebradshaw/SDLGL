@@ -48,7 +48,7 @@ float xang =-77, yang = 43 ;
 bool bFirst = true ;
 
 IcoSphere icosphere(1, { 0, 1, 0 }, { 1.0, 1.0,1.0,1 }) ;
-Cube cube          (1, { 3, 1, 0 }, { 1.0, 0.5,0.5,1 }) ;
+//Cube cube          (1, { 3, 1, 0 }, { 1.0, 0.5,0.5,1 }) ;
 Cube lightcube(0.1, { 0, 5, 0 }, { 1.0, 1.0, 1.0,1 }) ;
 
 float light_angle = 0 ;
@@ -238,15 +238,12 @@ light1.addLightToScene() ;
   glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);*/
   //lightRoot.origin = { lightpos1[0], lightpos1[1], lightpos1[2] } ;
 
-
-
   debugDisplay.PrintAt(0,0,(long int)xang) ;
   debugDisplay.PrintAt(10,0,(long int)yang) ;
   debugDisplay.PrintAt(0,3,(long int)particleCloud.count()) ;
   debugDisplay.PrintAt(0,4,(long int)particleFountain.count()) ;
   debugDisplay.PrintAt(0,5,(long int)particleBurster.count()) ; 
   /* We don't want to modify the projection matrix. */
-//cout << "draw_screen 3" << endl ;
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity( );
 
@@ -255,7 +252,6 @@ light1.addLightToScene() ;
             0,     1,     0) ;
 
   icosphere.draw() ;
-  //cube.draw() ; 
   lightcube.draw() ; 
   draw_wire_gridY(10,0.5,0) ;
 
