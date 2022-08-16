@@ -6,9 +6,6 @@
 #include <GL/glut.h>
 #endif
 
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -17,19 +14,17 @@
 #include <fstream>
 #include <sstream>
 
-using std::cout, std::endl ;
+using std::cout, std::endl;
 /**************************************************************************/
 #include "constants.h"
 #include "datatypes.h"
 #include "types.h"
 #include "vector.h"
-//#include "object.h"
 #include "icosphere.h"
 #include "cube.h"
 #include "light.h"
 #include "grid.h"
 #include "textdisplay.h"
-//#include "particles.h"
 /**************************************************************************/
 
 point3D vp = {5, 3, 5}, vd, vt;
@@ -40,7 +35,7 @@ int moveDirection;
 float xang = -77, yang = 43;
 bool bFirst = true;
 
-float ftime = 0 ;
+float ftime = 0;
 bool isRunning = true;
 
 IcoSphere icosphere(1, {0, 1, 0}, {1.0, 1.0, 1.0, 1});
@@ -59,14 +54,13 @@ static void setup_scene()
 
   icosphere.do_subdivide();
   icosphere.do_subdivide();
-  icosphere.dump() ;
+  icosphere.dump();
 
   light0.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
   light0.setDiffuse(1, 0, 0, 1);
 
   light1.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
   light1.setDiffuse(0, 1, 0, 1);
-
 }
 
 static void animate(float delta)
@@ -74,7 +68,7 @@ static void animate(float delta)
 
   light_angle += 1 * delta;
 
-   GLfloat lightpos[] = {10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle), 1};
+  GLfloat lightpos[] = {10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle), 1};
   lightcube.setPosition({lightpos[0], lightpos[1], lightpos[2]});
   light0.setPosition(lightpos[0], lightpos[1], lightpos[2], lightpos[3]);
 
@@ -95,8 +89,6 @@ static void animate(float delta)
   vt.x = vp.x - vd.x;
   vt.y = vp.y - vd.y;
   vt.z = vp.z - vd.z;
-
-
 }
 /**************************************************************************/
 static void quit(int status)
@@ -108,10 +100,10 @@ static void quit(int status)
 
 static void process_events2(void)
 {
-   SDL_Event sdl_event ;
-    /* Process incoming events. */
-	while (SDL_PollEvent(&sdl_event) !=0)
-	{
+  SDL_Event sdl_event;
+  /* Process incoming events. */
+  while (SDL_PollEvent(&sdl_event) != 0)
+  {
     switch (sdl_event.type)
     {
     case SDL_MOUSEMOTION:
@@ -153,30 +145,30 @@ static void process_events2(void)
     }
     case SDL_QUIT:
       /* Handle quit requests (like Ctrl-c). */
-      isRunning = false ;
+      isRunning = false;
       break;
-	case SDL_KEYDOWN:
+    case SDL_KEYDOWN:
       switch (sdl_event.key.keysym.sym)
-	  {
-		  case SDLK_ESCAPE:
-		  	isRunning = false ;
-			break ;
-	  }
-	  break;
+      {
+      case SDLK_ESCAPE:
+        isRunning = false;
+        break;
+      }
+      break;
     }
-/*		if (sdl_event.type == SDL_QUIT)
-		{
-			isRunning = false ;
-		} else if (sdl_event.type == SDL_KEYDOWN)
-		{
-			switch (sdl_event.key.keysym.sym)
-			{
-				case SDLK_ESCAPE:
-					isRunning = false ;
-					break ;
-			}
-		}*/
-	}
+    /*		if (sdl_event.type == SDL_QUIT)
+        {
+          isRunning = false ;
+        } else if (sdl_event.type == SDL_KEYDOWN)
+        {
+          switch (sdl_event.key.keysym.sym)
+          {
+            case SDLK_ESCAPE:
+              isRunning = false ;
+              break ;
+          }
+        }*/
+  }
 }
 
 static void draw_screen(void)
@@ -200,12 +192,11 @@ static void draw_screen(void)
             vt.x, vt.y, vt.z,
             0, 1, 0);
 
-//glColor3f(1,1,1) ;
+  // glColor3f(1,1,1) ;
   icosphere.draw();
-//  icosphere.drawWireFrame();
-/*  icosphere.drawNormals();*/
+  //  icosphere.drawWireFrame();
+  /*  icosphere.drawNormals();*/
   draw_wire_gridY(10, 0.5, 0);
-
 }
 
 static void setup_opengl(int width, int height)
@@ -233,7 +224,7 @@ static void setup_opengl(int width, int height)
 
 int main(int argc, char *argv[])
 {
-	cout << "start of main..." << endl ;
+  cout << "start of main..." << endl;
   /* First, initialize SDL's video subsystem. */
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
@@ -242,20 +233,20 @@ int main(int argc, char *argv[])
             SDL_GetError());
     quit(1);
   }
-  cout << "After SDL_Init..." << endl ;
+  cout << "After SDL_Init..." << endl;
 
-  SDL_DisplayMode current ;
-    int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+  SDL_DisplayMode current;
+  int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
 
-    if(should_be_zero != 0)
-      // In case of error...
-      SDL_Log("Could not get display mode for video display #%d: %s", 0, SDL_GetError());
+  if (should_be_zero != 0)
+    // In case of error...
+    SDL_Log("Could not get display mode for video display #%d: %s", 0, SDL_GetError());
 
-    else
-      // On success, print the current display mode.
-      SDL_Log("Display #%d: current display mode is %dx%dpx @ %dhz.", 0, current.w, current.h, current.refresh_rate);
+  else
+    // On success, print the current display mode.
+    SDL_Log("Display #%d: current display mode is %dx%dpx @ %dhz.", 0, current.w, current.h, current.refresh_rate);
 
-  int width = current.w, height = current.h, bpp = 32 ;
+  int width = current.w, height = current.h, bpp = 32;
 
   cout << "video width: " << width << endl;
   cout << "video height: " << height << endl;
@@ -271,9 +262,9 @@ int main(int argc, char *argv[])
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 5);
   // cout << "Set a bunch of attributes..." << endl ;
-  Uint32 WindowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN ;
+  Uint32 WindowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
   SDL_Window *sdl_window = SDL_CreateWindow("OpenGL Test", 0, 0, width, height, WindowFlags);
-  SDL_GLContext glContext = SDL_GL_CreateContext(sdl_window) ;
+  SDL_GLContext glContext = SDL_GL_CreateContext(sdl_window);
 
   setup_opengl(width, height);
   cout << "Vendor: " << glGetString(GL_VENDOR) << endl;
@@ -296,12 +287,9 @@ int main(int argc, char *argv[])
 
   // cout << "about to enable light 1" << endl ;
   glEnable(GL_LIGHT1); // enable LIGHT0, our Diffuse Light
-  // cout << "enabled light 1" << endl ;
-  //glShadeModel(GL_SMOOTH); // set the shader to smooth shader
-
+                       // cout << "enabled light 1" << endl ;
   SDL_ShowCursor(SDL_DISABLE);
   SDL_SetRelativeMouseMode(SDL_TRUE);
-
 
   Uint32 old_time, current_time;
 
@@ -316,18 +304,18 @@ int main(int argc, char *argv[])
     current_time = SDL_GetTicks();
     ftime = (current_time - old_time) / 1000.0f;
 
-    process_events2() ;
+    process_events2();
     animate(ftime);
     /* Draw the screen. */
     draw_screen();
-	lightcube.draw() ;
+    lightcube.draw();
     debugDisplay.DrawTextDisplay();
-	SDL_GL_SwapWindow(sdl_window) ;
+    SDL_GL_SwapWindow(sdl_window);
   }
 
   cout << "Quiting...." << endl;
-  SDL_DestroyWindow(sdl_window) ;
-  SDL_GL_DeleteContext(glContext) ;
-  SDL_Quit() ;
+  SDL_DestroyWindow(sdl_window);
+  SDL_GL_DeleteContext(glContext);
+  SDL_Quit();
   return 0;
 }

@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -g -Wall -m64 -std=c++17 
-CPPFLAGS = -g -Wall -m64 -std=c++17 
+CFLAGS = -g -Wall -m64 -std=c++20 
+CPPFLAGS = -g -Wall -m64 -std=c++20 
 DEPS = datatypes.h types.h vector.h object.h icosphere.h grid.h textdisplay.h cube.h particles.h light.h
 
 ifeq ($(shell uname), Darwin)
