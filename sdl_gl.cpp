@@ -15,6 +15,7 @@
 #include <sstream>
 
 using std::cout, std::endl;
+
 /**************************************************************************/
 #include "constants.h"
 #include "datatypes.h"
