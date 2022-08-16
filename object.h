@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
@@ -35,6 +35,8 @@ public:
   void dump() ;
 
   void draw() ;
+  void drawWireFrame() ;
+  void drawNormals() ;
 
   void setPosition(struct point3D origin) ;
 

@@ -171,7 +171,7 @@ void Particles::animate(float delta,
 	// r = r0 + v0t + 0.5 at2
 
 	//particle *curr = root->next ;
-	particle *curr = root, *prev, *next;
+	particle *curr = root, /**prev, */ *next;
 
 	if (count() < maxParticles) {
 		emit() ;
@@ -188,7 +188,7 @@ void Particles::animate(float delta,
 		curr->age += delta ;
 
 		next = curr->next ;
-		prev = curr ;
+//		prev = curr ;
 		if (killParticle(curr)) {
 		//		if (curr->p.y < 0) {
 					curr->age = 0 ;

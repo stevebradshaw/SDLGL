@@ -1,7 +1,7 @@
 #ifndef TEXTDISPLAYH
 #define TEXTDISPLAYH
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
@@ -9,12 +9,13 @@
 #include <GL/glut.h>
 #endif
 
-using namespace std;
 
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+using std::cout, std::endl, std::ifstream, std::ios, std::stringstream ;
 
 class TextDisplay {
 

@@ -1,6 +1,5 @@
 #include "icosphere.h"
 
-
 IcoSphere::IcoSphere(float scale,
                      struct point3D origin,
                      struct rgba colour) : Object(scale, origin, colour) {
@@ -51,13 +50,16 @@ void IcoSphere::subdivide(node* t) {
   point3D a = normalize({(t->p1.x + t->p2.x)/2,(t->p1.y+t->p2.y)/2,(t->p1.z+t->p2.z)/2}),
           b = normalize({(t->p2.x + t->p3.x)/2,(t->p2.y+t->p3.y)/2,(t->p2.z+t->p3.z)/2}),
           c = normalize({(t->p3.x + t->p1.x)/2,(t->p3.y+t->p1.y)/2,(t->p3.z+t->p1.z)/2}) ;
+/*  point3D a = {(t->p1.x + t->p2.x)/2,(t->p1.y+t->p2.y)/2,(t->p1.z+t->p2.z)/2},
+          b = {(t->p2.x + t->p3.x)/2,(t->p2.y+t->p3.y)/2,(t->p2.z+t->p3.z)/2},
+          c = {(t->p3.x + t->p1.x)/2,(t->p3.y+t->p1.y)/2,(t->p3.z+t->p1.z)/2} ;*/
 
   addTriangle(t->p1, a, c) ;
   addTriangle(a, t->p2, b) ;
   addTriangle(b, t->p3, c) ;
   addTriangle(a, b, c) ;
 
-//  deleteTriangle(t->id) ;
+  deleteTriangle(t->id) ;
 }
 
 void IcoSphere::do_subdivide() {

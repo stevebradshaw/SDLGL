@@ -6,7 +6,7 @@
 #include <math.h>
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #if defined(__APPLE__)
 #include <GLUT/glut.h>

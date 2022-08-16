@@ -1,7 +1,7 @@
 #ifndef PARTICLESH
 #define PARTICLESH
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #include <stdio.h>
 #include <iostream>
@@ -9,7 +9,7 @@
 #include <sstream>
 #include <math.h>
 
-using namespace std;
+using std::cout, std::endl ;
 
 #if defined(__APPLE__)
 #include <GLUT/glut.h>

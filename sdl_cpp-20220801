@@ -9,6 +9,8 @@
 //#include <GL/gl.h>
 //#include <GL/glu.h>
 
+using namespace std;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -17,19 +19,18 @@
 #include <fstream>
 #include <sstream>
 
-using std::cout, std::endl ;
 /**************************************************************************/
 #include "constants.h"
 #include "datatypes.h"
 #include "types.h"
 #include "vector.h"
-//#include "object.h"
+#include "object.h"
 #include "icosphere.h"
 #include "cube.h"
 #include "light.h"
 #include "grid.h"
 #include "textdisplay.h"
-//#include "particles.h"
+#include "particles.h"
 /**************************************************************************/
 
 point3D vp = {5, 3, 5}, vd, vt;
@@ -41,9 +42,13 @@ float xang = -77, yang = 43;
 bool bFirst = true;
 
 float ftime = 0 ;
-bool isRunning = true;
+   bool isRunning = true;
 
 IcoSphere icosphere(1, {0, 1, 0}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere1(1, {-3, 1, -3}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere2(1, {3, 1, -3}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere3(1, {3, 1, 3}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere4(1, {-3, 1, 3}, {1.0, 1.0, 1.0, 1});
 
 Cube lightcube(0.1, {0, 5, 0}, {1.0, 1.0, 1.0, 1});
 
@@ -53,13 +58,23 @@ TextDisplay debugDisplay;
 
 Light light0(GL_LIGHT0), light1(GL_LIGHT1);
 
+Particles particleCloud;
+Particles particleFountain;
+Particles particleFountain2;
+Particles particleBurster;
 /**************************************************************************/
 static void setup_scene()
 {
 
+  icosphere1.do_subdivide();
+  icosphere2.do_subdivide();
+  icosphere3.do_subdivide();
+  icosphere4.do_subdivide();
   icosphere.do_subdivide();
   icosphere.do_subdivide();
-  icosphere.dump() ;
+  icosphere.do_subdivide();
+  icosphere.do_subdivide();
+  icosphere.do_subdivide();
 
   light0.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
   light0.setDiffuse(1, 0, 0, 1);
@@ -67,6 +82,29 @@ static void setup_scene()
   light1.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
   light1.setDiffuse(0, 1, 0, 1);
 
+  particleCloud.setMaxNumber(5000);
+  particleCloud.setEmitterType(1);
+  particleCloud.setEmitterOrigin({0, 5, 0});
+  particleCloud.setEmitterSize(10);
+  particleCloud.setEmitterStrength(1);
+
+  particleFountain.setMaxNumber(1000);
+  particleFountain.setEmitterType(2);
+  particleFountain.setEmitterOrigin({-2, 0, 0});
+  particleFountain.setEmitterSize(1);
+  particleFountain.setEmitterStrength(2);
+
+  particleFountain2.setMaxNumber(1000);
+  particleFountain2.setEmitterType(4);
+  particleFountain2.setEmitterOrigin({0, 5, 0});
+  particleFountain2.setEmitterSize(1);
+  particleFountain2.setEmitterStrength(2);
+
+  particleBurster.setMaxNumber(5000);
+  particleBurster.setEmitterType(4);
+  // particleBurster.setEmitterOrigin({2,10,2}) ;
+  particleBurster.setEmitterOrigin({10 * (GLfloat)cos(light_angle), 6 + 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle)});
+  particleBurster.setEmitterSize(1);
 }
 
 static void animate(float delta)
@@ -74,12 +112,7 @@ static void animate(float delta)
 
   light_angle += 1 * delta;
 
-   GLfloat lightpos[] = {10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle), 1};
-  lightcube.setPosition({lightpos[0], lightpos[1], lightpos[2]});
-  light0.setPosition(lightpos[0], lightpos[1], lightpos[2], lightpos[3]);
-
-  GLfloat lightpos1[] = {10 * (GLfloat)cos(light_angle + 10), 5 * (GLfloat)sin(3 * light_angle + 10), 10 * (GLfloat)sin(light_angle + 10), 1};
-  light1.setPosition(lightpos1[0], lightpos1[1], lightpos1[2], lightpos1[3]);
+  lightcube.setPosition({10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle)});
 
   /* Update user position and orientation based on input */
   vd.x = (-1 * cos(PI * yang / 360) * sin(PI * xang / 360));
@@ -96,7 +129,16 @@ static void animate(float delta)
   vt.y = vp.y - vd.y;
   vt.z = vp.z - vd.z;
 
+  particleCloud.animate(delta);
+  particleFountain.animate(delta);
+  particleFountain2.animate(delta);
+  particleBurster.animate(delta);
 
+  particleBurster.setEmitterOrigin({10 * (GLfloat)cos(light_angle), 6 + 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle)});
+  icosphere1.setPosition({3 * (GLfloat)cos(2*light_angle), 1, 3 * (GLfloat)sin(2*light_angle)});
+  icosphere2.setPosition({5 * (GLfloat)cos(2.5*light_angle), 1, 5 * (GLfloat)sin(2.5*light_angle)});
+  icosphere3.setPosition({7 * (GLfloat)cos(3*light_angle), 1, 7 * (GLfloat)sin(3*light_angle)});
+  icosphere4.setPosition({9 * (GLfloat)cos(1.5*light_angle), 1, 9 * (GLfloat)sin(1.5*light_angle)});
 }
 /**************************************************************************/
 static void quit(int status)
@@ -182,13 +224,43 @@ static void process_events2(void)
 static void draw_screen(void)
 {
 
+  // glStencilMask(0xFFFFFFFF);
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+
+  GLfloat lightpos[] = {10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle), 1};
+
+  //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+  GLfloat diffuse0[] = {1.0f, 0.0f, 0.0f , 1.0f};
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
+
+  GLfloat ambient0[] = {0.0f, 0.0f, 1.0f, 0.0f};
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
+  //lightRoot.origin = { lightpos[0], lightpos[1], lightpos[2] } ;*/
+
+  light0.setPosition(lightpos[0], lightpos[1], lightpos[2], lightpos[3]);
   light0.addLightToScene();
+
+  GLfloat lightpos1[] = {10 * (GLfloat)cos(light_angle + 10), 5 * (GLfloat)sin(3 * light_angle + 10), 10 * (GLfloat)sin(light_angle + 10), 1};
+
+  light1.setPosition(lightpos1[0], lightpos1[1], lightpos1[2], lightpos1[3]);
   light1.addLightToScene();
+  /*  glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
+
+    GLfloat diffuse1[] = {0.0f, 1.0f, 0.0f , 1.0f};
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
+
+    GLfloat ambient1[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);*/
+  // lightRoot.origin = { lightpos1[0], lightpos1[1], lightpos1[2] } ;
 
   debugDisplay.PrintAt(0, 0, (long int)xang);
   debugDisplay.PrintAt(10, 0, (long int)yang);
+  debugDisplay.PrintAt(0, 3, (long int)particleCloud.count());
+  debugDisplay.PrintAt(0, 4, (long int)particleFountain.count());
+  debugDisplay.PrintAt(0, 5, (long int)particleBurster.count());
   debugDisplay.PrintAt(10, 0, ftime);
   debugDisplay.PrintAt(20, 0, 1 / ftime);
 
@@ -200,12 +272,24 @@ static void draw_screen(void)
             vt.x, vt.y, vt.z,
             0, 1, 0);
 
-//glColor3f(1,1,1) ;
   icosphere.draw();
-//  icosphere.drawWireFrame();
-/*  icosphere.drawNormals();*/
+  icosphere1.draw();
+  icosphere2.draw();
+  icosphere3.draw();
+  icosphere4.draw();
   draw_wire_gridY(10, 0.5, 0);
 
+  particleCloud.draw();
+  particleCloud.drawEmitter();
+
+  particleFountain.draw();
+  particleFountain.drawEmitter();
+
+  particleFountain2.draw();
+  particleFountain2.drawEmitter();
+
+  particleBurster.draw();
+  particleBurster.drawEmitter();
 }
 
 static void setup_opengl(int width, int height)
@@ -233,7 +317,6 @@ static void setup_opengl(int width, int height)
 
 int main(int argc, char *argv[])
 {
-	cout << "start of main..." << endl ;
   /* First, initialize SDL's video subsystem. */
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
@@ -242,7 +325,6 @@ int main(int argc, char *argv[])
             SDL_GetError());
     quit(1);
   }
-  cout << "After SDL_Init..." << endl ;
 
   SDL_DisplayMode current ;
     int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
@@ -297,7 +379,7 @@ int main(int argc, char *argv[])
   // cout << "about to enable light 1" << endl ;
   glEnable(GL_LIGHT1); // enable LIGHT0, our Diffuse Light
   // cout << "enabled light 1" << endl ;
-  //glShadeModel(GL_SMOOTH); // set the shader to smooth shader
+  glShadeModel(GL_SMOOTH); // set the shader to smooth shader
 
   SDL_ShowCursor(SDL_DISABLE);
   SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -311,7 +393,7 @@ int main(int argc, char *argv[])
   while (isRunning)
   {
 
-    debugDisplay.ClearTextDisplay();
+  debugDisplay.ClearTextDisplay();
     old_time = current_time;
     current_time = SDL_GetTicks();
     ftime = (current_time - old_time) / 1000.0f;
@@ -320,8 +402,7 @@ int main(int argc, char *argv[])
     animate(ftime);
     /* Draw the screen. */
     draw_screen();
-	lightcube.draw() ;
-    debugDisplay.DrawTextDisplay();
+  debugDisplay.DrawTextDisplay();
 	SDL_GL_SwapWindow(sdl_window) ;
   }
 

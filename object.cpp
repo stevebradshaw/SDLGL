@@ -1,6 +1,6 @@
+//#include <iostream>
+
 #include "object.h"
-
-
 
 void Object::addTriangle(struct point3D p1,
                          struct point3D p2,
@@ -39,19 +39,30 @@ void Object::deleteTriangle(unsigned int id) {
 
   while (t != 0) {
     if (t->id == id) {
+//		std::cout << "Found triangle to delete..." << std::endl ;
       // handle the case where its the first element of the list differently as
       // we need to repoint the root node
       if (root.next == t) {
+//		  std::cout << "root.next == t" << std::endl ;
         root.next = t->next ;
+	    t =0 ; 
       } else {
+//		  std::cout << "p->next = t->next" << std::endl ;
+
         p->next = t->next ;
+		t = 0 ;
+
       }
       free(t) ;
       t=0 ;
     } else {
       p = t ;
-      t = t->next ;
+      //t = t->next ;
     }
+//	std::cout << "go to next" << std::endl ;
+	if ( t != 0) {
+      t = t->next ;
+	}
   }
 }
 
@@ -115,6 +126,65 @@ void Object::draw() {
   glEnd() ;
 
   glPopMatrix() ;
+}
+
+void Object::drawWireFrame() {
+
+  node *curr = root.next ;
+
+  float s = root.scale,
+        x = root.origin.x,
+        y = root.origin.y,
+        z = root.origin.z ; 
+
+  glEnable(GL_LIGHTING) ;
+
+  glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE) ;
+  glEnable(GL_COLOR_MATERIAL) ;
+
+  glColor3f(root.colour.r, root.colour.g, root.colour.b) ;
+
+  glPushMatrix() ;
+  glMatrixMode(GL_MODELVIEW) ;
+  glTranslatef(x,y,z) ;
+
+  glDisable(GL_LIGHTING) ;
+  glColor3f(1,1,1) ;
+  while (curr != 0) {
+ 
+    glBegin(GL_LINES) ;
+    glVertex3f(s*curr->p1.x, s*curr->p1.y, s*curr->p1.z) ;
+    glVertex3f(s*curr->p2.x, s*curr->p2.y, s*curr->p2.z) ;
+    glVertex3f(s*curr->p2.x, s*curr->p2.y, s*curr->p2.z) ;
+    glVertex3f(s*curr->p3.x, s*curr->p3.y, s*curr->p3.z) ;
+    glVertex3f(s*curr->p3.x, s*curr->p3.y, s*curr->p3.z) ;
+    glVertex3f(s*curr->p1.x, s*curr->p1.y, s*curr->p1.z) ;
+	glEnd() ;
+
+    curr = curr->next ;
+  }
+
+
+  glPopMatrix() ;
+}
+
+void Object::drawNormals() {
+  node *curr = root.next ;
+  glDisable(GL_LIGHTING) ;
+  glColor3f(1,1,1) ;
+  GLfloat cx, cy, cz ;
+  
+  while (curr != 0) {
+	  cx = root.origin.x + (curr->p1.x + curr->p2.x + curr->p3.x) / 3 ;
+	  cy = root.origin.y + (curr->p1.y + curr->p2.y + curr->p3.y) / 3 ;
+	  cz = root.origin.z + (curr->p1.z + curr->p2.z + curr->p3.z) / 3 ;
+	  glBegin(GL_LINES) ;
+        glVertex3f(cx,cy,cz) ;
+		glVertex3f(cx + 0.2 * curr->n.x, cy + 0.2 * curr->n.y, cz + 0.2 * curr->n.z) ;
+	  glEnd() ;
+    curr = curr->next ;
+  }
+
 }
 
 void Object::setPosition(struct point3D origin) {

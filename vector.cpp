@@ -10,7 +10,7 @@ struct point3D normalize(struct point3D p) {
 }
 
 struct point3D vector(struct point3D u, struct point3D v) {
-
+  return {u.x - v.x, u.y - v.y, u.z - v.z} ;
 }
 
 

@@ -1,0 +1,662 @@
+#include <SDL2/SDL.h>
+
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+
+//#include <GL/gl.h>
+//#include <GL/glu.h>
+
+using namespace std;
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+/**************************************************************************/
+#include "constants.h"
+#include "datatypes.h"
+#include "types.h"
+#include "vector.h"
+#include "object.h"
+#include "icosphere.h"
+#include "cube.h"
+#include "light.h"
+#include "grid.h"
+#include "textdisplay.h"
+#include "particles.h"
+/**************************************************************************/
+
+typedef int32_t i32;
+typedef uint32_t u32;
+typedef int32_t b32;
+
+point3D vp = {5, 3, 5}, vd, vt;
+
+bool bMove = false;
+int moveDirection;
+
+float xang = -77, yang = 43;
+bool bFirst = true;
+
+float ftime = 0 ;
+   bool isRunning = true;
+
+IcoSphere icosphere(1, {0, 1, 0}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere1(1, {-3, 1, -3}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere2(1, {3, 1, -3}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere3(1, {3, 1, 3}, {1.0, 1.0, 1.0, 1});
+IcoSphere icosphere4(1, {-3, 1, 3}, {1.0, 1.0, 1.0, 1});
+
+Cube lightcube(0.1, {0, 5, 0}, {1.0, 1.0, 1.0, 1});
+
+float light_angle = 0;
+
+TextDisplay debugDisplay;
+
+Light light0(GL_LIGHT0), light1(GL_LIGHT1);
+
+Particles particleCloud;
+Particles particleFountain;
+Particles particleFountain2;
+Particles particleBurster;
+/**************************************************************************/
+static void setup_scene()
+{
+
+  icosphere1.do_subdivide();
+  icosphere2.do_subdivide();
+  icosphere3.do_subdivide();
+  icosphere4.do_subdivide();
+  icosphere.do_subdivide();
+  icosphere.do_subdivide();
+  icosphere.do_subdivide();
+  icosphere.do_subdivide();
+  icosphere.do_subdivide();
+
+  light0.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
+  light0.setDiffuse(1, 0, 0, 1);
+
+  light1.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
+  light1.setDiffuse(0, 1, 0, 1);
+
+  particleCloud.setMaxNumber(5000);
+  particleCloud.setEmitterType(1);
+  particleCloud.setEmitterOrigin({0, 5, 0});
+  particleCloud.setEmitterSize(10);
+  particleCloud.setEmitterStrength(1);
+
+  particleFountain.setMaxNumber(1000);
+  particleFountain.setEmitterType(2);
+  particleFountain.setEmitterOrigin({-2, 0, 0});
+  particleFountain.setEmitterSize(1);
+  particleFountain.setEmitterStrength(2);
+
+  particleFountain2.setMaxNumber(1000);
+  particleFountain2.setEmitterType(4);
+  particleFountain2.setEmitterOrigin({0, 5, 0});
+  particleFountain2.setEmitterSize(1);
+  particleFountain2.setEmitterStrength(2);
+
+  particleBurster.setMaxNumber(5000);
+  particleBurster.setEmitterType(4);
+  // particleBurster.setEmitterOrigin({2,10,2}) ;
+  particleBurster.setEmitterOrigin({10 * (GLfloat)cos(light_angle), 6 + 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle)});
+  particleBurster.setEmitterSize(1);
+}
+
+static void animate(float delta)
+{
+
+  light_angle += 1 * delta;
+
+  lightcube.setPosition({10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle)});
+
+  /* Update user position and orientation based on input */
+  vd.x = (-1 * cos(PI * yang / 360) * sin(PI * xang / 360));
+  vd.y = sin(PI * yang / 360);
+  vd.z = cos(PI * yang / 360) * cos(PI * xang / 360);
+
+  if (bMove == true)
+  {
+    vp.x -= 8 * delta * moveDirection * vd.x;
+    vp.y -= 8 * delta * moveDirection * vd.y;
+    vp.z -= 8 * delta * moveDirection * vd.z;
+  }
+  vt.x = vp.x - vd.x;
+  vt.y = vp.y - vd.y;
+  vt.z = vp.z - vd.z;
+
+  particleCloud.animate(delta);
+  particleFountain.animate(delta);
+  particleFountain2.animate(delta);
+  particleBurster.animate(delta);
+
+  particleBurster.setEmitterOrigin({10 * (GLfloat)cos(light_angle), 6 + 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle)});
+  icosphere1.setPosition({3 * (GLfloat)cos(2*light_angle), 1, 3 * (GLfloat)sin(2*light_angle)});
+  icosphere2.setPosition({5 * (GLfloat)cos(2.5*light_angle), 1, 5 * (GLfloat)sin(2.5*light_angle)});
+  icosphere3.setPosition({7 * (GLfloat)cos(3*light_angle), 1, 7 * (GLfloat)sin(3*light_angle)});
+  icosphere4.setPosition({9 * (GLfloat)cos(1.5*light_angle), 1, 9 * (GLfloat)sin(1.5*light_angle)});
+}
+/**************************************************************************/
+static void quit(int status)
+{
+
+  SDL_Quit();
+  exit(status);
+}
+
+static void handle_key_down(SDL_Keysym *keysym)
+{
+
+  switch (keysym->sym)
+  {
+  case SDLK_ESCAPE:
+    quit(0);
+    break;
+  default:
+    break;
+  }
+}
+
+
+static void process_events2(void)
+{
+   SDL_Event sdl_event ;
+    /* Process incoming events. */
+	while (SDL_PollEvent(&sdl_event) !=0)
+	{
+    switch (sdl_event.type)
+    {
+    case SDL_MOUSEMOTION:
+
+      if (bFirst == false)
+      {
+        // TODO: Limit yang to +/- 179
+        xang += sdl_event.motion.xrel;
+        yang += sdl_event.motion.yrel;
+        if (yang > 179)
+          yang = 179;
+
+        if (yang < -179)
+          yang = -179;
+      }
+      bFirst = false;
+
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+    {
+      Uint8 mouse_state = SDL_GetMouseState(NULL, NULL);
+      if (mouse_state & SDL_BUTTON_LMASK)
+      {
+        bMove = true;
+        moveDirection = 1;
+      }
+      if (mouse_state & SDL_BUTTON_RMASK)
+      {
+        bMove = true;
+        moveDirection = -1;
+      }
+      break;
+    }
+    case SDL_MOUSEBUTTONUP:
+    {
+      bMove = false;
+      break;
+    }
+    case SDL_QUIT:
+      /* Handle quit requests (like Ctrl-c). */
+      isRunning = false ;
+      break;
+	case SDL_KEYDOWN:
+      switch (sdl_event.key.keysym.sym)
+	  {
+		  case SDLK_ESCAPE:
+		  	isRunning = false ;
+			break ;
+	  }
+	  break;
+    }
+/*		if (sdl_event.type == SDL_QUIT)
+		{
+			isRunning = false ;
+		} else if (sdl_event.type == SDL_KEYDOWN)
+		{
+			switch (sdl_event.key.keysym.sym)
+			{
+				case SDLK_ESCAPE:
+					isRunning = false ;
+					break ;
+			}
+		}*/
+	}
+}
+static void process_events(void)
+{
+  /* Our SDL event placeholder. */
+  SDL_Event event;
+
+  /* Grab all the events off the queue. */
+  while (SDL_PollEvent(&event))
+  {
+
+    switch (event.type)
+    {
+    case SDL_KEYDOWN:
+      /* Handle key presses. */
+      handle_key_down(&event.key.keysym);
+      break;
+    case SDL_MOUSEMOTION:
+
+      if (bFirst == false)
+      {
+        // TODO: Limit yang to +/- 179
+        xang += event.motion.xrel;
+        yang += event.motion.yrel;
+        if (yang > 179)
+          yang = 179;
+
+        if (yang < -179)
+          yang = -179;
+      }
+      bFirst = false;
+
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+    {
+      Uint8 mouse_state = SDL_GetMouseState(NULL, NULL);
+      if (mouse_state & SDL_BUTTON_LMASK)
+      {
+        bMove = true;
+        moveDirection = 1;
+      }
+      if (mouse_state & SDL_BUTTON_RMASK)
+      {
+        bMove = true;
+        moveDirection = -1;
+      }
+      break;
+    }
+    case SDL_MOUSEBUTTONUP:
+    {
+      bMove = false;
+      break;
+    }
+    case SDL_QUIT:
+      /* Handle quit requests (like Ctrl-c). */
+      quit(0);
+      break;
+    }
+  }
+}
+
+static void draw_screen(void)
+{
+
+  // glStencilMask(0xFFFFFFFF);
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+  debugDisplay.ClearTextDisplay();
+
+  GLfloat lightpos[] = {10 * (GLfloat)cos(light_angle), 5 * (GLfloat)sin(3 * light_angle), 10 * (GLfloat)sin(light_angle), 1};
+
+  //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+  GLfloat diffuse0[] = {1.0f, 0.0f, 0.0f , 1.0f};
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
+
+  GLfloat ambient0[] = {0.0f, 0.0f, 1.0f, 0.0f};
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
+  //lightRoot.origin = { lightpos[0], lightpos[1], lightpos[2] } ;*/
+
+  light0.setPosition(lightpos[0], lightpos[1], lightpos[2], lightpos[3]);
+  light0.addLightToScene();
+
+  GLfloat lightpos1[] = {10 * (GLfloat)cos(light_angle + 10), 5 * (GLfloat)sin(3 * light_angle + 10), 10 * (GLfloat)sin(light_angle + 10), 1};
+
+  light1.setPosition(lightpos1[0], lightpos1[1], lightpos1[2], lightpos1[3]);
+  light1.addLightToScene();
+  /*  glLightfv(GL_LIGHT1, GL_POSITION, lightpos1);
+
+    GLfloat diffuse1[] = {0.0f, 1.0f, 0.0f , 1.0f};
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
+
+    GLfloat ambient1[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);*/
+  // lightRoot.origin = { lightpos1[0], lightpos1[1], lightpos1[2] } ;
+
+  debugDisplay.PrintAt(0, 0, (long int)xang);
+  debugDisplay.PrintAt(10, 0, (long int)yang);
+  debugDisplay.PrintAt(0, 3, (long int)particleCloud.count());
+  debugDisplay.PrintAt(0, 4, (long int)particleFountain.count());
+  debugDisplay.PrintAt(0, 5, (long int)particleBurster.count());
+  debugDisplay.PrintAt(10, 0, ftime);
+  debugDisplay.PrintAt(20, 0, 1 / ftime);
+
+  /* We don't want to modify the projection matrix. */
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  gluLookAt(vp.x, vp.y, vp.z,
+            vt.x, vt.y, vt.z,
+            0, 1, 0);
+
+  icosphere.draw();
+  icosphere1.draw();
+  icosphere2.draw();
+  icosphere3.draw();
+  icosphere4.draw();
+  draw_wire_gridY(10, 0.5, 0);
+
+  particleCloud.draw();
+  particleCloud.drawEmitter();
+
+  particleFountain.draw();
+  particleFountain.drawEmitter();
+
+  particleFountain2.draw();
+  particleFountain2.drawEmitter();
+
+  particleBurster.draw();
+  particleBurster.drawEmitter();
+  debugDisplay.DrawTextDisplay();
+
+  //SDL_GL_SwapBuffers();
+}
+
+static void setup_opengl(int width, int height)
+{
+  float ratio = (float)width / (float)height;
+
+  /* Our shading model--Gouraud (smooth). */
+  glShadeModel(GL_SMOOTH);
+
+  /* Culling. */
+  glCullFace(GL_BACK);
+  glFrontFace(GL_CCW);
+  glEnable(GL_CULL_FACE);
+
+  /* Set the clear color. */
+  glClearColor(0, 0, 0, 0);
+
+  /* Setup our viewport. */
+  glViewport(0, 0, width, height);
+
+  /*
+   * Change to the projection matrix and set
+   * our viewing volume.
+   */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(60.0, ratio, 0.01, 1024.0);
+}
+
+int main(int argc, char *argv[])
+{
+//unsigned int window_flags = SDL_WINDOW_OPENGL;
+
+
+  /* Dimensions of our window. */
+  /* Color depth in bits of our window. */
+//  int bpp = 32;
+  /* Flags we will pass into SDL_SetVideoMode. */
+  //int flags = 0;
+
+  /* First, initialize SDL's video subsystem. */
+  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+  {
+    /* Failed, exit. */
+    fprintf(stderr, "Video initialization failed: %s\n",
+            SDL_GetError());
+    quit(1);
+  }
+
+SDL_DisplayMode current ;
+    int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+
+    if(should_be_zero != 0)
+      // In case of error...
+      SDL_Log("Could not get display mode for video display #%d: %s", 0, SDL_GetError());
+
+    else
+      // On success, print the current display mode.
+      SDL_Log("Display #%d: current display mode is %dx%dpx @ %dhz.", 0, current.w, current.h, current.refresh_rate);
+
+  int width = current.w, height = current.h, bpp = 32 ;
+//const SDL_VideoInfo *vinfo = SDL_GetVideoInfo();
+
+  /* Let's get some video information. */
+//  info = SDL_GetVideoInfo();
+  // cout << "Got VideoInfo" << endl ;
+  // const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
+  // const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
+  // cout << "Renderer: " << renderer << endl ;
+/*  if (!info)
+  {
+    fprintf(stderr, "Video query failed: %s\n",
+            SDL_GetError());
+    quit(1);
+  }*/
+
+  /*
+   * Set our width/height to (you would
+   * of course let the user decide this in a normal
+   * app). We get the bpp we will request from
+   * the display. On X11, VidMode can't change
+   * resolution, so this is probably being overly
+   * safe. Under Win32, ChangeDisplaySettings
+   * can change the bpp.
+   */
+
+//  bpp = info->vfmt->BitsPerPixel;
+
+//  width = info->current_w;
+//  height = info->current_h;
+  cout << "video width: " << width << endl;
+  cout << "video height: " << height << endl;
+  cout << "video bpp: " << bpp << endl;
+  // cout << "SetProperties" << endl ;
+  debugDisplay.SetProperties(width, height);
+
+  // cout << "DOne SetProperties" << endl ;
+  /*
+   * Now, we want to setup our requested
+   * window attributes for our OpenGL window.
+   * We want *at least* 5 bits of red, green
+   * and blue. We also want at least a 16-bit
+   * depth buffer.
+   *
+   * The last thing we do is request a double
+   * buffered window. '1' turns on double
+   * buffering, '0' turns it off.
+   *
+   * Note that we do not use SDL_DOUBLEBUF in
+   * the flags to SDL_SetVideoMode. That does
+   * not affect the GL attribute state, only
+   * the standard 2D blitting setup.
+   */
+  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 5);
+  // cout << "Set a bunch of attributes..." << endl ;
+  /*
+   * We want to request that SDL provide us
+   * with an OpenGL window, in a fullscreen
+   * video mode.
+   */
+//  flags = SDL_OPENGL | SDL_FULLSCREEN;
+
+  /*
+   * Set the video mode
+   */
+//  if (SDL_SetVideoMode(width, height, bpp, flags) == 0)
+//  {
+//    /*
+//     * This could happen for a variety of reasons,
+//     * including DISPLAY not being set, the specified
+//     * resolution not being available, etc.
+//     */
+//    fprintf(stderr, "Video mode set failed: %s\n",
+//            SDL_GetError());
+//    quit(1);
+//  }
+  // cout << "After set video mode" << endl ;
+
+  /*
+   * At this point, we should have a properly setup
+   * double-buffered window for use with OpenGL.
+   */
+  u32 WindowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN ;
+  SDL_Window *sdl_window = SDL_CreateWindow("OpenGL Test", 0, 0, width, height, WindowFlags);
+  //assert(sdl_window);
+  SDL_GLContext glContext = SDL_GL_CreateContext(sdl_window) ;
+
+  setup_opengl(width, height);
+  cout << "Vendor: " << glGetString(GL_VENDOR) << endl;
+  cout << "Renderer: " << glGetString(GL_RENDERER) << endl;
+  // cout << "after setup opengl" << endl ;
+  debugDisplay.InitFontTextures();
+  // cout << "after init font textures" << endl;
+
+  setup_scene();
+
+  // cout << "subdivided icosphere" << endl ;
+  // particleCloud.dump() ;
+  glEnable(GL_DEPTH_TEST);
+  // cout << "enabled depth test" << endl ;
+  glDepthFunc(GL_LESS);
+
+  glEnable(GL_LIGHTING); // enable the lighting
+  // cout << "enabled lighting" << endl ;
+
+  // cout << "set light properties" << endl ;
+
+  // glEnable (GL_LIGHT0); //enable LIGHT0, our Diffuse Light
+  // cout << "about to enable light 1" << endl ;
+  glEnable(GL_LIGHT1); // enable LIGHT0, our Diffuse Light
+  // cout << "enabled light 1" << endl ;
+  glShadeModel(GL_SMOOTH); // set the shader to smooth shader
+
+  SDL_ShowCursor(SDL_DISABLE);
+  //SDL_WM_GrabInput(SDL_GRAB_ON);
+  SDL_SetRelativeMouseMode(SDL_TRUE);
+
+  //SDL_Event event;
+
+  Uint32 old_time, current_time;
+//  float ftime;
+
+  // Need to initialize this here for event loop to work
+  current_time = SDL_GetTicks();
+
+  //SDL_PollEvent(&event);
+
+  /*
+   * Now we want to begin our normal app process--
+   * an event loop with a lot of redrawing.
+   */
+   SDL_Event sdl_event ;
+
+  while (isRunning)
+  {
+    /* Process incoming events. */
+	while (SDL_PollEvent(&sdl_event) !=0)
+	{
+    switch (sdl_event.type)
+    {
+    case SDL_MOUSEMOTION:
+
+      if (bFirst == false)
+      {
+        // TODO: Limit yang to +/- 179
+        xang += sdl_event.motion.xrel;
+        yang += sdl_event.motion.yrel;
+        if (yang > 179)
+          yang = 179;
+
+        if (yang < -179)
+          yang = -179;
+      }
+      bFirst = false;
+
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+    {
+      Uint8 mouse_state = SDL_GetMouseState(NULL, NULL);
+      if (mouse_state & SDL_BUTTON_LMASK)
+      {
+        bMove = true;
+        moveDirection = 1;
+      }
+      if (mouse_state & SDL_BUTTON_RMASK)
+      {
+        bMove = true;
+        moveDirection = -1;
+      }
+      break;
+    }
+    case SDL_MOUSEBUTTONUP:
+    {
+      bMove = false;
+      break;
+    }
+    case SDL_QUIT:
+      /* Handle quit requests (like Ctrl-c). */
+      isRunning = false ;
+      break;
+	case SDL_KEYDOWN:
+      switch (sdl_event.key.keysym.sym)
+	  {
+		  case SDLK_ESCAPE:
+		  	isRunning = false ;
+			break ;
+	  }
+	  break;
+    }
+/*		if (sdl_event.type == SDL_QUIT)
+		{
+			isRunning = false ;
+		} else if (sdl_event.type == SDL_KEYDOWN)
+		{
+			switch (sdl_event.key.keysym.sym)
+			{
+				case SDLK_ESCAPE:
+					isRunning = false ;
+					break ;
+			}
+		}*/
+
+
+	}
+
+    old_time = current_time;
+    current_time = SDL_GetTicks();
+    ftime = (current_time - old_time) / 1000.0f;
+//    process_events();
+
+process_events2() ;
+    animate(ftime);
+    /* Draw the screen. */
+    draw_screen();
+	SDL_GL_SwapWindow(sdl_window) ;
+  }
+
+  cout << "Quiting...." << endl;
+  SDL_DestroyWindow(sdl_window) ;
+  SDL_GL_DeleteContext(glContext) ;
+  SDL_Quit() ;
+  return 0;
+}
