@@ -1,0 +1,14 @@
+make sdl_gl --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/steve/source/cpp/SDL2GL'
+g++ -g -Wall -m64 -std=c++20  -c sdl_gl.cpp
+g++ -g -Wall -m64 -std=c++20  -c cube.cpp
+g++ -g -Wall -m64 -std=c++20  -c object.cpp
+g++ -g -Wall -m64 -std=c++20  -c vector.cpp
+g++ -g -Wall -m64 -std=c++20  -c grid.cpp
+g++ -g -Wall -m64 -std=c++20  -c textdisplay.cpp
+g++ -g -Wall -m64 -std=c++20  -c particles.cpp
+g++ -g -Wall -m64 -std=c++20  -c icosphere.cpp
+g++ -g -Wall -m64 -std=c++20  -c light.cpp
+g++ -g -Wall -m64 -std=c++20  -o sdl_gl sdl_gl.o cube.o object.o vector.o grid.o textdisplay.o particles.o icosphere.o light.o -lGL -lGLU -lglut -lSDL2 
+make: Leaving directory '/home/steve/source/cpp/SDL2GL'
+ 

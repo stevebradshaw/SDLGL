@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/steve/source/cpp/SDL2GL",
+            "binaryPath": "/home/steve/source/cpp/SDL2GL/sdl_gl",
+            "binaryArgs": []
+        }
+    ]
+}

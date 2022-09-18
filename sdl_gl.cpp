@@ -47,21 +47,20 @@ float light_angle = 0;
 
 TextDisplay debugDisplay;
 
-Light light0(GL_LIGHT0), light1(GL_LIGHT1);
+Light light0(GL_LIGHT0) ; // light1(GL_LIGHT1);
 
 /**************************************************************************/
 static void setup_scene()
 {
-
   icosphere.do_subdivide();
   icosphere.do_subdivide();
   icosphere.dump();
 
   light0.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
-  light0.setDiffuse(1, 0, 0, 1);
+  light0.setDiffuse(1, 1, 1, 1);
 
-  light1.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
-  light1.setDiffuse(0, 1, 0, 1);
+  //light1.setAmbient(0.0f, 0.0f, 0.0f, 0.0f);
+  //light1.setDiffuse(0.1, 0.1, 0.1, 1);
 }
 
 static void animate(float delta)
@@ -73,8 +72,8 @@ static void animate(float delta)
   lightcube.setPosition({lightpos[0], lightpos[1], lightpos[2]});
   light0.setPosition(lightpos[0], lightpos[1], lightpos[2], lightpos[3]);
 
-  GLfloat lightpos1[] = {10 * (GLfloat)cos(light_angle + 10), 5 * (GLfloat)sin(3 * light_angle + 10), 10 * (GLfloat)sin(light_angle + 10), 1};
-  light1.setPosition(lightpos1[0], lightpos1[1], lightpos1[2], lightpos1[3]);
+  //GLfloat lightpos1[] = {10 * (GLfloat)cos(light_angle + 10), 5 * (GLfloat)sin(3 * light_angle + 10), 10 * (GLfloat)sin(light_angle + 10), 1};
+  //light1.setPosition(lightpos1[0], lightpos1[1], lightpos1[2], lightpos1[3]);
 
   /* Update user position and orientation based on input */
   vd.x = (-1 * cos(PI * yang / 360) * sin(PI * xang / 360));
@@ -178,7 +177,7 @@ static void draw_screen(void)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
   light0.addLightToScene();
-  light1.addLightToScene();
+  //light1.addLightToScene();
 
   debugDisplay.PrintAt(0, 0, (long int)xang);
   debugDisplay.PrintAt(10, 0, (long int)yang);
@@ -197,7 +196,8 @@ static void draw_screen(void)
   icosphere.draw();
   //  icosphere.drawWireFrame();
   /*  icosphere.drawNormals();*/
-  draw_wire_gridY(10, 0.5, 0);
+  //draw_wire_gridY(10, 0.5, 0);
+  draw_gridY(10, 0.5, 5,0);
 }
 
 static void setup_opengl(int width, int height)
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
   // cout << "set light properties" << endl ;
 
   // cout << "about to enable light 1" << endl ;
-  glEnable(GL_LIGHT1); // enable LIGHT0, our Diffuse Light
+  //glEnable(GL_LIGHT1); // enable LIGHT0, our Diffuse Light
                        // cout << "enabled light 1" << endl ;
   SDL_ShowCursor(SDL_DISABLE);
   SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -319,4 +319,5 @@ int main(int argc, char *argv[])
   SDL_GL_DeleteContext(glContext);
   SDL_Quit();
   return 0;
+
 }
